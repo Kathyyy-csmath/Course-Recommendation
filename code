@@ -1,0 +1,124 @@
+#include <iostream> 
+#include <vector>
+#include <string> 
+#include <algorithm>
+
+using namespace std;
+
+struct Course {
+    string id;
+    string name;
+    string loctation;
+    int credit;
+    int day;
+    int start;
+    int end;
+};
+
+struct creadit_litmit {
+    int limit;
+    int current;
+};
+bool conflict(const Course& a, const Course& b) {
+    if (a.day != b.day) return false;
+    return a.day == b.day && !(a.end <= b.start || b.end <= a.start);
+};
+    void printCourse(const Course& course) {
+    cout << "Course ID: " << course.id << endl;
+    cout << "Course Name: " << course.name << endl;
+    cout << "Location: " << course.loctation << endl;
+    cout << "Credit: " << course.credit << endl;
+    cout << "Day: " << course.day << endl;
+    cout << "Start Time: " << course.start << endl;
+    cout << "End Time: " << course.end << endl;
+    cout << "------------------------" << endl;
+};
+
+int calcScore(const vector<Course>& selected,
+              const vector<string>& wantList) {
+    int score = 0;
+    for (const auto& c : selected) {
+        if (find(wantList.begin(), wantList.end(), c.id) != wantList.end()) {
+            score += 10; 
+        }
+    }
+    return score;
+};
+
+int main() {
+
+    int creadit;
+    cout << "Enter your credit limit: ";
+    cin >> creadit;
+
+    int K; //Want to take K courses
+    cout << "Enter number of courses you want to take: ";
+    cin >> K;
+    
+    vector<Course> course;
+    vector<string> wantList;
+    for (int i = 0; i < K; i++) {
+        Course c;
+        string w;
+        cout << "Enter course details (id name location credit day start end):" << endl;
+        cin >> c.id >> c.name >> c.loctation >> c.credit >> c.day >> c.start >> c.end;
+        w = c.id;
+        wantList.push_back(w);
+        course.push_back(c);
+    }
+
+    vector<pair<int, vector<Course>>> results;
+
+       int n = (int)course.size();
+    for (int mask = 1; mask < (1 << n); mask++) {
+        vector<Course> chosen;
+        int totalCredit = 0;
+        bool ok = true;
+
+        for (int i = 0; i < n; i++) {
+            if (mask & (1 << i)) {
+                for (const auto& c : chosen) {
+                    if (conflict(c, course[i])) {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (!ok) break;
+
+                totalCredit += course[i].credit;
+                if (totalCredit > creadit) {
+                    ok = false;
+                    break;
+                }
+                chosen.push_back(course[i]);
+            }
+        }
+
+        if (ok) {
+            int sc = calcScore(chosen, wantList);
+            results.push_back({sc, chosen});
+        }
+    }
+
+    sort(results.begin(), results.end(),
+         [](const auto& a, const auto& b) {
+             return a.first > b.first;
+         });
+
+    int count = min(3, (int)results.size());
+    for (int i = 0; i < count; i++) {
+        cout << "Option " << (i + 1) << results[i].first << "):\n";
+        for (const auto& c : results[i].second) {
+            cout << "  " << c.id << " " << c.name
+                 << " Credit:" << c.credit << "\n";
+        }
+        cout << "-----------------------\n";
+    }
+
+    return 0;
+    
+};
+
+
+
+
