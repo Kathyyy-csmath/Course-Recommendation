@@ -15,9 +15,3 @@ A simple course recommendation system written in C++ that helps students build o
 ## 🛠️ Tech Stack
 - **C++17**
 - Standard Template Library (`vector`, `string`, `algorithm`)
-
-## 📖 Usage
-1. Clone the repo:
-   ```bash
-   git clone https://github.com/your-username/course-recommender.git
-   cd course-recommender/src
